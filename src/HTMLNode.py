@@ -14,7 +14,7 @@ class HTMLNode:
         #makes the html link from the given props dict
         if self.props == None:
             return ""
-        if len(self.props) == 1:
+        if len(self.props) == 2:
             return f' href="{self.props["href"]}" target="{self.props["target"]}"'
 
         return f' href="{self.props["href"]}"'
@@ -47,6 +47,19 @@ class LeafNode(HTMLNode):
         return f"HTMLNode({self.tag}, {self.value}, {self.props})"
 
 
+class ParentNode(HTMLNode):
+    def __init__(self, tag: str, children: list, props: dict | None=None):
+        super().__init__(tag, None, children, props)
+
+    def to_html(self):
+        final_str = ""
+        if self.tag == None:
+            raise ValueError("Parent requires a tag")
+        if self.children == None or len(self.children) == 0:
+            raise ValueError("Parent requires children")
+        for c in self.children:
+            final_str += c.to_html()
+        return f"<{self.tag}>{final_str}</{self.tag}>"
 
 
 
