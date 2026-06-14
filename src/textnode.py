@@ -3,8 +3,8 @@ from HTMLNode import LeafNode
 
 class TextType(Enum):
     TEXT = "" #"plain"
-    BOLD = "b" #"**Boldtext**"
-    ITALIC = "i" #"_Italic_"
+    BOLD = "**" #"**Boldtext**"
+    ITALIC = "_" #"_Italic_"
     CODE = "`" #"`Code`"
     LINKS = "a" #"[anchor](url)"
     IMAGES = "img" #"![alt](url)"
@@ -34,9 +34,9 @@ def text_node_to_html_node(text_node: TextNode)->LeafNode:
         case TextType.TEXT:
             return LeafNode(None ,text_node.text, None)
         case TextType.BOLD:
-            return LeafNode(TextType.BOLD.value, text_node.text, None)
+            return LeafNode("b", text_node.text, None)
         case TextType.ITALIC:
-            return LeafNode(TextType.ITALIC.value, text_node.text, None)
+            return LeafNode("i", text_node.text, None)
         case TextType.CODE:
             return LeafNode(TextType.CODE.value, text_node.text, None)
         case TextType.LINKS:
