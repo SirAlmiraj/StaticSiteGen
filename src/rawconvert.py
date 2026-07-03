@@ -8,6 +8,7 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
     for n in old_nodes:
         if n.text_type != TextType.TEXT:
             final_list.append(n)
+            continue
         if delimiter not in TextType:
             raise Exception("Invalid Markdown syntax")
 
@@ -23,9 +24,62 @@ def split_nodes_delimiter(old_nodes: list[TextNode], delimiter: str, text_type: 
     return final_list
 
 def extract_markdown_images(text: str):
-    return re.findall(r"\[(.*?)\]\((.*?)\)", text)
+    return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
 
 def extract_markdown_links(text: str):
     return re.findall(r"\[(.*?)\]\((.*?)\)", text)
+
+def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
+    final_list = []
+    link_text = []
+
+    for text_node in old_nodes:
+        if text_node.text_type != TextType.TEXT:
+            final_list.append(text_node)
+            continue
+
+        val = text_node.text
+        link_text = extract_markdown_images(val)
+        temp = []
+        for pairs in link_text:
+            sections = val.split(f"![{pairs[0]}]({pairs[1]})", 1)
+            if sections[0] != "":
+                temp.append(TextNode(sections[0], TextType.TEXT))
+            temp.append(TextNode(pairs[0], TextType.IMAGES, pairs[1]))
+            val = sections[1]
+        if val != "":
+            temp.append(TextNode(val, TextType.TEXT))
+
+        final_list.extend(temp)
+
+    return final_list
+
+
+def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
+    final_list = []
+    link_text = []
+
+    for text_node in old_nodes:
+        if text_node.text_type != TextType.TEXT:
+            final_list.append(text_node)
+            continue
+
+        val = text_node.text
+        link_text = extract_markdown_links(val)
+        temp = []
+        for pairs in link_text:
+            sections = val.split(f"[{pairs[0]}]({pairs[1]})", 1)
+            if sections[0] != "":
+                temp.append(TextNode(sections[0], TextType.TEXT))
+            temp.append(TextNode(pairs[0], TextType.LINKS, pairs[1]))
+            val = sections[1]
+        if val != "":
+            temp.append(TextNode(val, TextType.TEXT))
+
+        final_list.extend(temp)
+
+    return final_list
+
+
 
 
