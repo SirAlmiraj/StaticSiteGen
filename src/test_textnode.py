@@ -144,5 +144,52 @@ This is the same paragraph on a new line
             ],
         )
 
+    def test_block_to_block_type(self):
+        md = """
+# Header type
+
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+"""
+        blocks = markdown_to_blocks(md)
+        block_type = block_to_block_type(blocks[1])
+        header = block_to_block_type(blocks[0])
+        un_list = block_to_block_type(blocks[3])
+        self.assertEqual(block_type, BlockType.PARAGRAPH)
+        self.assertEqual(header, BlockType.HEADING)
+        self.assertEqual(un_list, BlockType.UNORDERED_LIST)
+
+    def test_block_to_block_type2(self):
+        md = """
+> monkey
+
+>monkey 2 electric boogaloo
+
+```
+coding wohoo
+line1 
+lime2 
+end code
+```
+
+1. item1 
+2. items
+3. items3 
+"""
+        blocks = markdown_to_blocks(md)
+        print(blocks)
+        quote_space = block_to_block_type(blocks[0])
+        quote = block_to_block_type(blocks[1])
+        code_block = block_to_block_type(blocks[2])
+        order = block_to_block_type(blocks[3])
+        self.assertEqual([quote_space, quote], [BlockType.QUOTE, BlockType.QUOTE])
+        self.assertEqual(code_block, BlockType.CODE)
+        self.assertEqual(order, BlockType.ORDERED_LIST)
+
 if __name__ == "__main__":
     unittest.main()
