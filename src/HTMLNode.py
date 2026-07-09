@@ -14,8 +14,10 @@ class HTMLNode:
         #makes the html link from the given props dict
         if self.props == None:
             return ""
-        if len(self.props) == 2:
+        if "target" in self.props:
             return f' href="{self.props["href"]}" target="{self.props["target"]}"'
+        elif "src" in self.props:
+            return f' src="{self.props["src"]}" alt="{self.props["alt"]}"'
 
         return f' href="{self.props["href"]}"'
 

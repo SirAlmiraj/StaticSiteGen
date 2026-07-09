@@ -2,6 +2,8 @@ from textnode import TextNode, TextType, text_node_to_html_node
 from HTMLNode import HTMLNode, ParentNode, LeafNode
 from rawconvert import *
 from enum import Enum
+import os
+import shutil
 
 class BlockType(Enum):
     PARAGRAPH = ''
@@ -35,16 +37,19 @@ def markdown_to_html_node(markdown):
                 children = text_to_children(b)
                 html_node = ParentNode('p', children, None)
             case BlockType.HEADING:
-                b = b.strip(BlockType.Heading.value)
-                children = text_to_children(b)
                 num_heading = count_heading(b)
+                b = b.strip(BlockType.HEADING.value)
+                b = b.strip()
+                children = text_to_children(b)
                 html_node = ParentNode(f"h{num_heading}", children, None)
             case BlockType.QUOTE:
                 children = []
                 clean_line = []
                 lines = b.split('\n')
                 for l in lines:
-                    clean_line.append(l.strip(BlockType.QUOTE.value))
+                    cleaned = l.strip(BlockType.QUOTE.value)
+                    cleaned = cleaned.strip()
+                    clean_line.append(cleaned)
                 final_line = " ".join(clean_line)
                 children = text_to_children(final_line)
                 html_node = ParentNode('blockquote', children, None)
@@ -52,7 +57,9 @@ def markdown_to_html_node(markdown):
                 items = b.split('\n')
                 parent_list = []
                 for i in items:
-                    children = text_to_children(i.strip(BlockType.UNORDERED_LIST))
+                    cleaned = i.strip(BlockType.UNORDERED_LIST.value)
+                    cleaned = cleaned.strip()
+                    children = text_to_children(cleaned)
                     parent = ParentNode('li', children, None)
                     parent_list.append(parent)
                 html_node = ParentNode('ul', parent_list, None)
@@ -73,7 +80,6 @@ def markdown_to_html_node(markdown):
         block_list.append(html_node)
 
     return ParentNode('div', block_list, None)
-
 
 def text_to_children(text: string):
     final_list = []
@@ -145,6 +151,34 @@ def count_heading(heading: string):
             raise Exception("This is not a heading")
 
 
+def extract_title(markdown):
+    section = markdown_to_blocks(markdown)
+    for head in section:
+        if head.startswith('# '):
+            clean_head = head.strip('#')
+            clean_head = clean_head.strip()
+            return clean_head
+    raise Exception("No h1")
+
+def generate_page(from_path, template_path, dest_path):
+    print(f"Generating page from {from_path} to {dest_path} using {template_path}")
+
+    with open(from_path, 'r') as f:
+        md_file = f.read()
+
+    with open(template_path, 'r') as f:
+        template = f.read()
+
+    node = markdown_to_html_node(md_file)
+    gen_html = node.to_html()
+    title = extract_title(md_file)
+
+    page = template.replace("{{ Title }}", title)
+    page = page.replace("{{ Content }}", gen_html)
+    print(page)
+
+    with open(dest_path, 'w') as f:
+        f.write(page)
 
 
 

@@ -224,5 +224,37 @@ the **same** even with inline stuff
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
         )
 
+    def test_obtain_title(self):
+        md = """
+# Titiles
+
+This is **bolded** paragraph
+text in a p
+tag here
+
+This is another paragraph with _italic_ text and `code` here
+
+"""
+        title = extract_title(md)
+        self.assertEqual(title, "Titiles")
+
+    def test_obtain_title1(self):
+        md = """
+some random text
+
+## mini title?
+
+# Titiles with more character
+
+This is **bolded** paragraph
+text in a p
+tag here
+
+This is another paragraph with _italic_ text and `code` here
+
+"""
+        title = extract_title(md)
+        self.assertEqual(title, "Titiles with more character")
+
 if __name__ == "__main__":
     unittest.main()

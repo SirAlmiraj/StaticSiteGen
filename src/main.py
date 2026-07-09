@@ -1,5 +1,6 @@
 from textnode import TextNode
 from HTMLNode import HTMLNode
+from text_to_node import generate_page
 import os
 import shutil
 
@@ -7,6 +8,7 @@ def main():
     public_path = "./public/"
     static_path = "./static/"
     static_public_copy(static_path, public_path)
+    generate_page("content/index.md", "template.html", "public/index.html")
 
 def static_public_copy(src, pub):
     public_path = "./public/"
@@ -27,8 +29,6 @@ def static_public_copy(src, pub):
         else:
             static_public_copy(src_path, dst_path)
 
-def recur_copy(stat: string, pub: string):
-    pass
 
 
 main()
