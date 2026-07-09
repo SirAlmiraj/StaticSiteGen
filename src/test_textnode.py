@@ -110,7 +110,7 @@ class TestTextNode(unittest.TestCase):
         )
 
     def test_t2t(self):
-        result = text_to_textnode()
+        result = text_to_textnode("This is **text** with an _italic_ word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)")
         self.assertListEqual([
             TextNode("This is ", TextType.TEXT),
             TextNode("text", TextType.BOLD),
@@ -167,6 +167,8 @@ This is the same paragraph on a new line
     def test_block_to_block_type2(self):
         md = """
 > monkey
+> horse
+> babi
 
 >monkey 2 electric boogaloo
 
@@ -182,7 +184,6 @@ end code
 3. items3 
 """
         blocks = markdown_to_blocks(md)
-        print(blocks)
         quote_space = block_to_block_type(blocks[0])
         quote = block_to_block_type(blocks[1])
         code_block = block_to_block_type(blocks[2])
@@ -190,6 +191,38 @@ end code
         self.assertEqual([quote_space, quote], [BlockType.QUOTE, BlockType.QUOTE])
         self.assertEqual(code_block, BlockType.CODE)
         self.assertEqual(order, BlockType.ORDERED_LIST)
+
+    def test_paragraphs(self):
+        md = """
+This is **bolded** paragraph
+text in a p
+tag here
+
+This is another paragraph with _italic_ text and `code` here
+
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+        )
+
+    def test_codeblock(self):
+        md = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+        )
 
 if __name__ == "__main__":
     unittest.main()
