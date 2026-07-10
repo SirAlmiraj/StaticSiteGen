@@ -175,10 +175,21 @@ def generate_page(from_path, template_path, dest_path):
 
     page = template.replace("{{ Title }}", title)
     page = page.replace("{{ Content }}", gen_html)
-    print(page)
 
     with open(dest_path, 'w') as f:
         f.write(page)
 
+def generate_page_recursive(dir_path_content, template_path, des_dir_path):
+    content_list = os.listdir(dir_path_content)
+
+    for file in content_list:
+        curr = os.path.join(dir_path_content, file)
+        des_curr = os.path.join(des_dir_path, file.replace(".md", ".html"))
+
+        if os.path.isfile(curr):
+            generate_page(curr, template_path, des_curr)
+        else:
+            os.makedirs(des_curr)
+            generate_page_recursive(curr, template_path, des_curr)
 
 

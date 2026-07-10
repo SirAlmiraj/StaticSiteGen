@@ -1,6 +1,6 @@
 from textnode import TextNode
 from HTMLNode import HTMLNode
-from text_to_node import generate_page
+from text_to_node import generate_page_recursive, generate_page
 import os
 import shutil
 
@@ -8,14 +8,11 @@ def main():
     public_path = "./public/"
     static_path = "./static/"
     static_public_copy(static_path, public_path)
-    generate_page("content/index.md", "template.html", "public/index.html")
+    generate_page_recursive("content/", "template.html", "public/")
 
 def static_public_copy(src, pub):
-    public_path = "./public/"
-    static_path = "./static/"
-
     if os.path.exists(pub):
-        print(f"Removing files from {public_path}")
+        print(f"Removing files from {pub}")
         shutil.rmtree(pub)
     print("Creating dir")
     os.mkdir(pub)
